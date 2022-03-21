@@ -1,0 +1,31 @@
+schema: '2.0'
+stages:
+  depth:
+    cmd: singularity run --no-home --cleanenv --containall --bind $(realpath $(dvc
+      root)/../..)/data/hdf5:/mnt/out:rw --bind $(realpath $(dvc root)/../..)/data/hdf5/TRACMASS_run.hdf5:/mnt/in/TRACMASS_run.hdf5:ro
+      --bind $(realpath $(dvc root)/../..)/data/external/bathymetry/GEBCO_2020.nc:/mnt/in/bathymetry.nc:ro
+      --bind $(realpath $(dvc root)/../..)/data/external/coordref/dt_global_allsat_phy_l4_20000101.nc:/mnt/in/coordref.nc:ro
+      --bind $(realpath $(dvc root)/../..)/params.yaml:/mnt/in/params.yaml:ro ../../src/dians-v2022.2.0.sif
+      create_column --tracmass-hdf5=/mnt/in/TRACMASS_run.hdf5 --bathymetry-file=/mnt/in/bathymetry.nc
+      --coordref-file=/mnt/in/coordref.nc --params=/mnt/in/params.yaml --column-dst=/mnt/out
+      --column=depth --debug --initrow=1_000_000_000 --nrows=1_000_000
+    deps:
+    - path: ../../data/external/bathymetry/GEBCO_2020.nc
+      md5: 262ce268212aaf914a192d74638fcace
+      size: 7466008877
+    - path: ../../data/external/coordref/dt_global_allsat_phy_l4_20000101.nc
+      md5: 69a3beb33ae6cce40d9773f8da1ea33a
+      size: 2523160
+    - path: ../../data/hdf5/TRACMASS_run.hdf5
+      md5: 88673606f06aa422c2cd66cd698c29ec
+      size: 245650906248
+    - path: ../../params.yaml
+      md5: d82e8f0d0fa526edc9a8c7dff559df0e
+      size: 2623
+    - path: ../../src/dians-v2022.2.0.sif
+      md5: 218630c4eb87913ebe01a7693bc35239
+      size: 720613376
+    outs:
+    - path: ../../data/hdf5/column_depth-debug.hdf5
+      md5: c281e1df2a20835328646ca68ffb4d60
+      size: 8008856

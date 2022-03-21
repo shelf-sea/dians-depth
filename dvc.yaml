@@ -1,0 +1,31 @@
+stages:
+  depth:
+    vars:
+      - container:
+          out: /mnt/out
+          tmf: /mnt/in/TRACMASS_run.hdf5
+          bat: /mnt/in/bathymetry.nc
+          ref: /mnt/in/coordref.nc
+      - ../../params.yaml
+    cmd:
+      singularity run --no-home --cleanenv --containall
+        --bind $(realpath $(dvc root)/../..)/${data.hdf5}:${container.out}:rw
+        --bind $(realpath $(dvc root)/../..)/${data.tracmass_hdf5}:${container.tmf}:ro
+        --bind $(realpath $(dvc root)/../..)/${data.bathymetry}:${container.bat}:ro
+        --bind $(realpath $(dvc root)/../..)/${data.coordref}:${container.ref}:ro
+        --bind $(realpath $(dvc root)/../..)/params.yaml:/mnt/in/params.yaml:ro
+      ../../src/dians-${package_version}.sif create_column
+        --tracmass-hdf5=${container.tmf}
+        --bathymetry-file=${container.bat}
+        --coordref-file=${container.ref}
+        --params=/mnt/in/params.yaml
+        --column-dst=${container.out}
+        --column=depth
+    deps:
+      - ../../${data.tracmass_hdf5}
+      - ../../${data.coordref}
+      - ../../${data.bathymetry}
+      - ../../params.yaml
+      - ../../src/dians-${package_version}.sif
+    outs:
+      - ../../${data.depth}
